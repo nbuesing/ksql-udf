@@ -1,0 +1,55 @@
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+    id 'distribution'
+}
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://packages.confluent.io/maven/"
+    }
+}
+
+
+dependencies {
+
+    //"io.confluent.ksql:ksqldb-udf:5.5.0"
+    compileOnly group: 'io.confluent.ksql', name: 'ksqldb-udf', version: '5.5.1'
+    compileOnly group: 'org.apache.kafka', name: 'connect-api', version: '2.5.1'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombok_version
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombok_version
+
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombok_version
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombok_version
+}
+
+shadowJar() {
+    dependsOn clean
+//    dependencies {
+//        // exclude dependencies provided in the kafka connect classpath
+//        exclude dependency("org.apache.kafka:connect-api:$kafka_version")
+//        exclude dependency("org.apache.kafka:kafka-clients:$kafka_version")
+//        exclude dependency('net.jpountz.lz4:.*:.*')
+//        exclude dependency('org.xerial.snappy:.*:.*')
+//        exclude dependency('org.slf4j:.*:.*')
+//    }
+}
+
+
+distributions {
+
+    main {
+        baseName = "nbuesing-${project.name}"
+        contents {
+            into("lib/") {
+                from(jar)
+                from(configurations.runtimeClasspath)
+            }
+        }
+    }
+}
